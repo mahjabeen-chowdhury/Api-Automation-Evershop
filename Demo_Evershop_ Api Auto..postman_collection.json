@@ -1,0 +1,383 @@
+{
+  "info": {
+    "_postman_id": "df1b2b03-353f-4054-bbd0-4215649b0874",
+    "name": "Demo_Evershop_ Api Auto.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50409216",
+    "_collection_link": "https://go.postman.co/collection/50409216-df1b2b03-353f-4054-bbd0-4215649b0874?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Search",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseBody = pm.response.json();\r",
+              "\r",
+              "\r",
+              "pm.test(\"Validate status code is 200\",()=>{\r",
+              "\r",
+              "    pm.expect(200).to.eql(pm.response.code)\r",
+              "\r",
+              "})\r",
+              "   \r",
+              "\r",
+              "pm.test(\"Validate Success atribute have true value\",()=>{\r",
+              "\r",
+              "  pm.expect(true).to.eql(responseBody.success)\r",
+              "\r",
+              "\r",
+              "})\r",
+              "\r",
+              "\r",
+              "const selectedProductSKU = responseBody.eContext.graphqlResponse.eqg118nmnimiekh.products.items[0].sku;\r",
+              "pm.collectionVariables.set(\"selected_product\", selectedProductSKU);\r",
+              "\r",
+              "const selectedProductPrice = responseBody.eContext.graphqlResponse.eqg118nmnimiekh.products.items[0].price.regular.value;\r",
+              "pm.collectionVariables.set(\"selected_product_price\", selectedProductPrice);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function getRandomArbitrary(min, max) {\r",
+              "\r",
+              "return Math.floor(Math.random() * (max-min) + min);\r",
+              "\r",
+              "}\r",
+              "\r",
+              "const dataset= [\"Ceramic Candy Bowl - Black\" , \"Stainless Steel Thermos - Yellow\", \"Desk Pen Holder - Yellow\"];\r",
+              "const randomNumber = getRandomArbitrary(0,2);\r",
+              "const searchText = dataset[randomNumber];\r",
+              "pm.collectionVariables.set(\"searched_text\",searchText);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://demo.evershop.io/search?key=value&keyword={{searched_text}}&ajax=true",
+          "protocol": "https",
+          "host": [
+            "demo",
+            "evershop",
+            "io"
+          ],
+          "path": [
+            "search"
+          ],
+          "query": [
+            {
+              "key": "key",
+              "value": "value"
+            },
+            {
+              "key": "keyword",
+              "value": "{{searched_text}}"
+            },
+            {
+              "key": "ajax",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add to  Cart",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "function getRandomArbitrary(min, max) {\r",
+              "\r",
+              "return Math.floor(Math.random() * (max-min) + min);\r",
+              "\r",
+              "}\r",
+              "\r",
+              "const randomNumber = getRandomArbitrary(1,3);\r",
+              "pm.collectionVariables.set(\"product_qty\",randomNumber);\r",
+              "\r",
+              "\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseBody = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Validate status code is 200\",()=>{\r",
+              "\r",
+              "    pm.expect(200).to.eql(pm.response.code)\r",
+              "\r",
+              "})\r",
+              "  \r",
+              "\r",
+              "const expectedQty = pm.collectionVariables.get(\"product_qty\") + pm.collectionVariables.get(\"prev_qty\");\r",
+              "\r",
+              "const actualQty = responseBody.data.item.qty;\r",
+              "\r",
+              " pm.collectionVariables.set(\"total_qty\",actualQty);\r",
+              "\r",
+              "pm.test(\"Vallidate the quantity is correct\",()=>{\r",
+              "    pm.expect(expectedQty).to.eql(actualQty)\r",
+              "})\r",
+              "\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\"qty\": \"{{product_qty}}\",\r\n\"sku\": \"{{selected_product}}\"\r\n\r\n\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://demo.evershop.io/api/cart/mine/items",
+          "protocol": "https",
+          "host": [
+            "demo",
+            "evershop",
+            "io"
+          ],
+          "path": [
+            "api",
+            "cart",
+            "mine",
+            "items"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Pre_View Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseBody = pm.response.json();\r",
+              "\r",
+              "\r",
+              "pm.test(\"Validate status code is 200\",()=>{\r",
+              "\r",
+              "    pm.expect(200).to.eql(pm.response.code)\r",
+              "\r",
+              "})\r",
+              "\r",
+              "const prevQty = responseBody.eContext.graphqlResponse.eqg118nmnimiemq.totalQty;\r",
+              "pm.collectionVariables.set(\"prev_qty\",prevQty)"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://demo.evershop.io/cart?Key=Value&ajax=true",
+          "protocol": "https",
+          "host": [
+            "demo",
+            "evershop",
+            "io"
+          ],
+          "path": [
+            "cart"
+          ],
+          "query": [
+            {
+              "key": "Key",
+              "value": "Value"
+            },
+            {
+              "key": "ajax",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Post_view Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseBody = pm.response.json();\r",
+              "\r",
+              "\r",
+              "  pm.test(\"Validate status code is 200\",()=>{\r",
+              "\r",
+              "    pm.expect(200).to.eql(pm.response.code)\r",
+              "\r",
+              "})\r",
+              "\r",
+              "\r",
+              " const actualPrice = responseBody.eContext.graphqlResponse.items.subTotal.value;      //subtotal issue\r",
+              "\r",
+              " const totalQty = pm.collectionVariables.get(\"total_qty\");\r",
+              "\r",
+              " const singleProductPrice = pm.collectionVariables.get(\"selected_product_price\");\r",
+              "\r",
+              "\r",
+              "  const expectedPrice =  totalQty * singleProductPrice;\r",
+              "\r",
+              "  \r",
+              "   pm.test(\"Validate total qty showing correct\", ()=>{\r",
+              "\r",
+              "    pm.expect(expectedPrice).to.eql(actualPrice);\r",
+              "\r",
+              "})   \r",
+              "  \r",
+              "        \r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://demo.evershop.io/cart?Key=Value&ajax=true",
+          "protocol": "https",
+          "host": [
+            "demo",
+            "evershop",
+            "io"
+          ],
+          "path": [
+            "cart"
+          ],
+          "query": [
+            {
+              "key": "Key",
+              "value": "Value"
+            },
+            {
+              "key": "ajax",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "searched_text",
+      "value": ""
+    },
+    {
+      "key": "selected_product",
+      "value": ""
+    },
+    {
+      "key": "selected_product_price",
+      "value": ""
+    },
+    {
+      "key": "product_qty",
+      "value": ""
+    },
+    {
+      "key": "total_qty",
+      "value": ""
+    },
+    {
+      "key": "prev_qty",
+      "value": ""
+    }
+  ]
+}
